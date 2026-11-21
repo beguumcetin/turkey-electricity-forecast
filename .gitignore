@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.env
+*.tgt
+tgt*
+.DS_Store
+.ipynb_checkpoints/
+# Raw EPİAŞ downloads and the big feature table are rebuilt by the scripts.
+data/raw/
+data/processed/features.parquet
+
+# Local working notes for Claude Code
+CLAUDE.md
