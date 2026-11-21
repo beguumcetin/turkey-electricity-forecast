@@ -61,3 +61,7 @@ python3 -m venv .venv
 - Tüketim ve yük planı: EPİAŞ Şeffaflık Platformu, Ocak 2019'dan itibaren.
 - Hava durumu: Open-Meteo tarihsel arşivi.
 - Tatiller: `holidays` Python paketi.
+
+## İletişim
+
+Begüm Çetin · begumcetin22@gmail.com · [GitHub](https://github.com/beguumcetin)

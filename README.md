@@ -61,3 +61,7 @@ python3 -m venv .venv
 - Consumption and the load plan: EPİAŞ Transparency Platform, from January 2019.
 - Weather: Open-Meteo historical archive.
 - Holidays: the `holidays` Python package.
+
+## Contact
+
+Begüm Çetin · begumcetin22@gmail.com · [GitHub](https://github.com/beguumcetin)
