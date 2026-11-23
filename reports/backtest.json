@@ -1,0 +1,61 @@
+{
+  "folds": [
+    {
+      "test_period": [
+        "2023-11-24",
+        "2024-11-23"
+      ],
+      "train_hours": 42576,
+      "hours_scored": 8257,
+      "lightgbm_trees": 4992,
+      "MAPE": {
+        "seasonal_naive": 5.46,
+        "ridge": 3.47,
+        "lightgbm": 2.32,
+        "epias_plan": 3.52
+      },
+      "share_days_lightgbm_better": 0.722
+    },
+    {
+      "test_period": [
+        "2024-11-24",
+        "2025-11-23"
+      ],
+      "train_hours": 51360,
+      "hours_scored": 8760,
+      "lightgbm_trees": 4902,
+      "MAPE": {
+        "seasonal_naive": 5.31,
+        "ridge": 3.36,
+        "lightgbm": 2.26,
+        "epias_plan": 3.12
+      },
+      "share_days_lightgbm_better": 0.688
+    },
+    {
+      "test_period": [
+        "2025-11-24",
+        "2026-11-23"
+      ],
+      "train_hours": 60120,
+      "hours_scored": 8735,
+      "lightgbm_trees": 419,
+      "MAPE": {
+        "seasonal_naive": 5.06,
+        "ridge": 3.4,
+        "lightgbm": 2.46,
+        "epias_plan": 2.6
+      },
+      "share_days_lightgbm_better": 0.541
+    }
+  ],
+  "pooled": {
+    "days": 1074,
+    "share_days_lightgbm_better": 0.649,
+    "mean_daily_mape_gain_pp": 0.727,
+    "weekly_block_bootstrap_95ci_pp": [
+      0.551,
+      1.005
+    ]
+  }
+}

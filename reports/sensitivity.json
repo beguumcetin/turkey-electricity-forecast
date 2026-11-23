@@ -1,36 +1,18 @@
 {
   "hours_scored": 8735,
-  "epias_plan": {
-    "MAPE": 2.6,
-    "MAE": 1045
-  },
-  "lightgbm_observed_temperature": {
-    "MAPE": 2.27,
-    "MAE": 933
-  },
-  "lightgbm_temperature_error_sd_1C": {
-    "MAPE": 2.32,
-    "MAE": 957
-  },
-  "lightgbm_temperature_error_sd_2C": {
-    "MAPE": 2.45,
-    "MAE": 1014
-  },
-  "lightgbm_temperature_error_sd_3C": {
-    "MAPE": 2.58,
-    "MAE": 1069
-  },
-  "lightgbm_no_weather": {
-    "MAPE": 2.5,
-    "MAE": 1022
+  "MAPE": {
+    "lightgbm_forecast_temp": 2.46,
+    "lightgbm_observed_temp": 2.27,
+    "lightgbm_no_weather": 2.5,
+    "epias_plan": 2.6
   },
   "daily_comparison": {
     "days": 364,
-    "share_days_lightgbm_better": 0.58,
-    "mean_mape_gain_pp": 0.325,
-    "bootstrap_95ci_pp": [
-      0.158,
-      0.499
+    "share_days_lightgbm_better": 0.541,
+    "mean_daily_mape_gain_pp": 0.138,
+    "weekly_block_bootstrap_95ci_pp": [
+      -0.105,
+      0.412
     ]
   }
 }

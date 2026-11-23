@@ -43,6 +43,34 @@ def holiday_table(years) -> pd.DataFrame:
     return df
 
 
+WEATHER_COLS = ["temp_national", "hdd", "cdd", "temp_24h_mean"]
+
+
+def weather_features(temp: pd.Series) -> pd.DataFrame:
+    """Temperature and what is derived from it. Kept in one place so the same
+    features can be rebuilt from a forecast temperature at evaluation time."""
+    return pd.DataFrame(
+        {
+            "temp_national": temp,
+            # Heating and cooling degrees: demand rises when it is cold (heating)
+            # and even more when it is hot (air conditioning).
+            "hdd": (18 - temp).clip(lower=0),
+            "cdd": (temp - 22).clip(lower=0),
+            "temp_24h_mean": temp.rolling(24, min_periods=12).mean(),
+        },
+        index=temp.index,
+    )
+
+
+def with_temperature(df: pd.DataFrame, temp_col: str) -> pd.DataFrame:
+    """Copy of the feature table with the weather features rebuilt from another
+    temperature column, e.g. an archived forecast instead of the observed value."""
+    out = df.copy()
+    for col, values in weather_features(df[temp_col]).items():
+        out[col] = values
+    return out
+
+
 def build(cons: pd.DataFrame, weather: pd.DataFrame) -> pd.DataFrame:
     df = cons.set_index("time").join(weather.set_index("time")[["temp_national"]], how="left")
     df["temp_national"] = df["temp_national"].interpolate(limit=3)
@@ -62,12 +90,8 @@ def build(cons: pd.DataFrame, weather: pd.DataFrame) -> pd.DataFrame:
     # Half-day holidays only start at 13:00.
     df["is_half_day"] = df["is_half_day"] * (df["hour"] >= 13)
 
-    # Heating and cooling degrees: demand rises when it is cold (heating) and
-    # even more when it is hot (air conditioning).
-    temp = df["temp_national"]
-    df["hdd"] = (18 - temp).clip(lower=0)
-    df["cdd"] = (temp - 22).clip(lower=0)
-    df["temp_24h_mean"] = temp.rolling(24, min_periods=12).mean()
+    for col, values in weather_features(df["temp_national"]).items():
+        df[col] = values
 
     # Lags of the target. Shifting by hours assumes a gap-free hourly index,
     # which make_hourly() guarantees.
@@ -94,6 +118,13 @@ def main():
 
     plan = pd.read_parquet(RAW_DIR / "load_plan.parquet").set_index("time")["epias_plan"]
     df["epias_plan"] = plan.reindex(df.index)
+
+    # Archived temperature forecasts, used only at evaluation time (see train.py).
+    fc_path = RAW_DIR / "weather_forecast.parquet"
+    if fc_path.exists():
+        fc = pd.read_parquet(fc_path).set_index("time")
+        for col in fc.columns:
+            df[col] = fc[col].reindex(df.index)
 
     df = df.dropna(subset=["consumption", f"lag_{max(LAGS)}h", "temp_national"])
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)

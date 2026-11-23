@@ -109,6 +109,24 @@ def monthly_errors(metrics):
     save(fig, "monthly_errors.png")
 
 
+def backtest_years(backtest):
+    """LightGBM against the load plan on each of the three test years."""
+    folds = backtest["folds"]
+    years = [f"{f['test_period'][0][:4]}–{f['test_period'][1][2:4]}" for f in folds]
+    x = range(len(folds))
+    fig, ax = plt.subplots(figsize=(7, 3.4))
+    for offset, key in [(-0.2, "lightgbm"), (0.2, "epias_plan")]:
+        vals = [f["MAPE"][key] for f in folds]
+        bars = ax.bar([i + offset for i in x], vals, width=0.38, color=COLORS[key], label=LABELS[key])
+        ax.bar_label(bars, labels=[f"{v:.2f}%" for v in vals], padding=3, fontsize=9)
+    ax.set_xticks(list(x), years)
+    ax.set_ylabel("MAPE (%)")
+    ax.set_ylim(0, max(f["MAPE"]["epias_plan"] for f in folds) * 1.3)
+    ax.set_title("Three test years, each forecast by a model trained only on earlier data")
+    ax.legend(frameon=False, ncol=2, loc="upper right")
+    save(fig, "backtest_years.png")
+
+
 def main():
     df = pd.read_parquet(PROCESSED_DIR / "features.parquet")
     pred = pd.read_parquet(PROCESSED_DIR / "predictions.parquet")
@@ -118,6 +136,9 @@ def main():
     temperature_curve(df)
     forecast_weeks(pred)
     monthly_errors(metrics)
+    backtest_path = ROOT / "reports" / "backtest.json"
+    if backtest_path.exists():
+        backtest_years(json.loads(backtest_path.read_text()))
     print(f"Figures written to {FIGURES_DIR}")
 
 

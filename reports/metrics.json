@@ -3,6 +3,8 @@
     "2025-11-24",
     "2026-11-23"
   ],
+  "hours_scored": 8735,
+  "temperature": "ridge and lightgbm use the temperature forecast 2 days ahead (Open-Meteo previous runs)",
   "lightgbm_trees": 419,
   "overall": {
     "seasonal_naive": {
@@ -10,16 +12,24 @@
       "MAE": 1983.418033199771
     },
     "ridge": {
-      "MAPE": 3.354449130724731,
-      "MAE": 1340.5036492049421
+      "MAPE": 3.404575124178337,
+      "MAE": 1363.8751759166319
     },
     "lightgbm": {
-      "MAPE": 2.2706815731859042,
-      "MAE": 932.7995858781389
+      "MAPE": 2.457761290993806,
+      "MAE": 1021.7995633925628
     },
     "epias_plan": {
       "MAPE": 2.596057315101445,
       "MAE": 1045.0911047510017
+    },
+    "lightgbm_observed_temp": {
+      "MAPE": 2.2706815731859042,
+      "MAE": 932.7995858781389
+    },
+    "lightgbm_fc_d1": {
+      "MAPE": 2.466381405298228,
+      "MAE": 1025.9478796883373
     }
   },
   "holidays_only": {
@@ -27,92 +37,98 @@
       "MAPE": 18.866448185604582
     },
     "ridge": {
-      "MAPE": 7.2162962232813515
+      "MAPE": 7.160280564346591
     },
     "lightgbm": {
-      "MAPE": 4.195340101298462
+      "MAPE": 4.240093194440012
     },
     "epias_plan": {
       "MAPE": 4.2675722784568615
+    },
+    "lightgbm_observed_temp": {
+      "MAPE": 4.195340101298462
+    },
+    "lightgbm_fc_d1": {
+      "MAPE": 4.274189759285752
     }
   },
   "monthly_MAPE": {
     "2025-11": {
       "seasonal_naive": 1.93,
-      "ridge": 2.13,
-      "lightgbm": 1.14,
+      "ridge": 2.32,
+      "lightgbm": 1.25,
       "epias_plan": 1.53
     },
     "2025-12": {
       "seasonal_naive": 2.21,
-      "ridge": 3.09,
-      "lightgbm": 1.84,
+      "ridge": 3.13,
+      "lightgbm": 1.95,
       "epias_plan": 2.23
     },
     "2026-01": {
       "seasonal_naive": 4.7,
-      "ridge": 3.88,
+      "ridge": 3.85,
       "lightgbm": 2.37,
       "epias_plan": 3.05
     },
     "2026-02": {
       "seasonal_naive": 3.08,
-      "ridge": 2.94,
-      "lightgbm": 2.43,
+      "ridge": 3.04,
+      "lightgbm": 2.57,
       "epias_plan": 2.7
     },
     "2026-03": {
       "seasonal_naive": 8.3,
-      "ridge": 5.04,
-      "lightgbm": 3.44,
+      "ridge": 5.11,
+      "lightgbm": 3.6,
       "epias_plan": 3.34
     },
     "2026-04": {
       "seasonal_naive": 3.29,
-      "ridge": 2.72,
+      "ridge": 2.7,
       "lightgbm": 1.92,
       "epias_plan": 2.89
     },
     "2026-05": {
       "seasonal_naive": 9.65,
-      "ridge": 4.43,
-      "lightgbm": 3.04,
+      "ridge": 4.34,
+      "lightgbm": 3.0,
       "epias_plan": 4.18
     },
     "2026-06": {
       "seasonal_naive": 8.94,
-      "ridge": 4.59,
-      "lightgbm": 1.86,
+      "ridge": 4.84,
+      "lightgbm": 2.33,
       "epias_plan": 2.45
     },
     "2026-07": {
       "seasonal_naive": 4.36,
-      "ridge": 2.89,
-      "lightgbm": 1.96,
+      "ridge": 2.91,
+      "lightgbm": 2.39,
       "epias_plan": 2.35
     },
     "2026-08": {
       "seasonal_naive": 4.97,
-      "ridge": 2.77,
-      "lightgbm": 2.82,
+      "ridge": 2.93,
+      "lightgbm": 3.47,
       "epias_plan": 2.42
     },
     "2026-09": {
       "seasonal_naive": 4.51,
-      "ridge": 2.13,
-      "lightgbm": 1.62,
+      "ridge": 2.18,
+      "lightgbm": 1.92,
       "epias_plan": 1.79
     },
     "2026-10": {
       "seasonal_naive": 2.68,
-      "ridge": 2.68,
-      "lightgbm": 1.62,
+      "ridge": 2.7,
+      "lightgbm": 1.61,
       "epias_plan": 1.86
     },
     "2026-11": {
       "seasonal_naive": 4.63,
-      "ridge": 3.34,
-      "lightgbm": 2.71,
+      "ridge": 3.35,
+      "lightgbm": 2.69,
       "epias_plan": 2.04
     }
   },

@@ -1,5 +1,10 @@
 """Train and compare day-ahead forecasts on the last 12 months.
 
+The models are trained on observed temperature, which is known for the past. On the
+test year they forecast with the temperature that was *forecast* two days earlier
+(archived Open-Meteo runs), which is what a real day-ahead forecaster has. The
+observed-temperature result is kept only as a reference.
+
 Models:
   - seasonal naive: same hour one week earlier
   - ridge regression on the same features
@@ -20,6 +25,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from src.config import MODELS_DIR, PROCESSED_DIR, ROOT, TEST_MONTHS
+from src.features import with_temperature
 
 TARGET = "consumption"
 CATEGORICAL = ["hour", "dayofweek", "month"]
@@ -84,6 +90,19 @@ def fit_lgbm(train):
     return final, best
 
 
+MODELS = ["seasonal_naive", "ridge", "lightgbm", "epias_plan"]
+REFERENCES = ["lightgbm_observed_temp", "lightgbm_fc_d1"]
+FAIR_TEMP = "temp_fc_d2"
+
+
+def predict_rows(model, frame: pd.DataFrame) -> pd.Series:
+    """Predict where every feature is present; NaN elsewhere."""
+    ok = frame[FEATURES].notna().all(axis=1)
+    out = pd.Series(np.nan, index=frame.index)
+    out[ok] = model.predict(frame.loc[ok, FEATURES])
+    return out
+
+
 def main():
     df = pd.read_parquet(PROCESSED_DIR / "features.parquet")
     train, test = split(df)
@@ -93,27 +112,36 @@ def main():
     ridge = fit_ridge(train)
     lgbm, n_trees = fit_lgbm(train)
 
+    # Rebuild the weather features from the archived forecasts on the whole table first,
+    # so the 24-hour rolling mean at the start of the test year is consistent.
+    fair = with_temperature(df, FAIR_TEMP).loc[test.index]
+    fc_d1 = with_temperature(df, "temp_fc_d1").loc[test.index]
+
     pred = pd.DataFrame({"actual": test[TARGET]}, index=test.index)
     pred["seasonal_naive"] = test["lag_168h"]
-    pred["ridge"] = ridge.predict(test[FEATURES])
-    pred["lightgbm"] = lgbm.predict(test[FEATURES])
+    pred["ridge"] = predict_rows(ridge, fair)
+    pred["lightgbm"] = predict_rows(lgbm, fair)
     pred["epias_plan"] = test["epias_plan"]
+    pred["lightgbm_observed_temp"] = predict_rows(lgbm, test)
+    pred["lightgbm_fc_d1"] = predict_rows(lgbm, fc_d1)
     pred["is_holiday"] = test["is_holiday"] | test["is_bridge"] | (test["days_to_bayram"] == 0)
 
-    models = ["seasonal_naive", "ridge", "lightgbm", "epias_plan"]
-    scored = pred.dropna(subset=models)
+    scored = pred.dropna(subset=MODELS + REFERENCES)
+    all_models = MODELS + REFERENCES
     metrics = {
         "test_period": [f"{test.index.min():%Y-%m-%d}", f"{test.index.max():%Y-%m-%d}"],
+        "hours_scored": int(len(scored)),
+        "temperature": "ridge and lightgbm use the temperature forecast 2 days ahead (Open-Meteo previous runs)",
         "lightgbm_trees": int(n_trees),
-        "overall": {m: {"MAPE": mape(scored.actual, scored[m]), "MAE": mae(scored.actual, scored[m])} for m in models},
+        "overall": {m: {"MAPE": mape(scored.actual, scored[m]), "MAE": mae(scored.actual, scored[m])} for m in all_models},
         "holidays_only": {
-            m: {"MAPE": mape(h.actual, h[m])} for h in [scored[scored.is_holiday == 1]] for m in models
+            m: {"MAPE": mape(h.actual, h[m])} for h in [scored[scored.is_holiday == 1]] for m in all_models
         },
     }
     monthly = (
         scored.assign(month=scored.index.strftime("%Y-%m"))
         .groupby("month")
-        .apply(lambda g: pd.Series({m: mape(g.actual, g[m]) for m in models}), include_groups=False)
+        .apply(lambda g: pd.Series({m: mape(g.actual, g[m]) for m in MODELS}), include_groups=False)
         .round(2)
     )
     metrics["monthly_MAPE"] = monthly.to_dict(orient="index")
@@ -130,9 +158,9 @@ def main():
     (ROOT / "reports").mkdir(exist_ok=True)
     (ROOT / "reports" / "metrics.json").write_text(json.dumps(metrics, indent=2, ensure_ascii=False))
 
-    print("\nTest MAPE (%):")
-    for m in models:
-        print(f"  {m:15s} {metrics['overall'][m]['MAPE']:.2f}   (holidays: {metrics['holidays_only'][m]['MAPE']:.2f})")
+    print(f"\nTest MAPE (%), {len(scored)} hours, temperature forecast 2 days ahead:")
+    for m in all_models:
+        print(f"  {m:24s} {metrics['overall'][m]['MAPE']:.2f}   (holidays: {metrics['holidays_only'][m]['MAPE']:.2f})")
 
 
 if __name__ == "__main__":

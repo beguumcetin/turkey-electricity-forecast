@@ -23,3 +23,6 @@ CITIES = {
     "antalya": (36.90, 30.70, 0.08),
     "adana": (37.00, 35.32, 0.07),
 }
+
+# Archived temperature forecasts (Open-Meteo Previous Runs API) are fetched from here on.
+FORECAST_START = "2023-01-01"
