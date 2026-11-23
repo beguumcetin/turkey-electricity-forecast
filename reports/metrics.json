@@ -1,0 +1,142 @@
+{
+  "test_period": [
+    "2025-11-24",
+    "2026-11-23"
+  ],
+  "lightgbm_trees": 419,
+  "overall": {
+    "seasonal_naive": {
+      "MAPE": 5.060529208011976,
+      "MAE": 1983.418033199771
+    },
+    "ridge": {
+      "MAPE": 3.354449130724731,
+      "MAE": 1340.5036492049421
+    },
+    "lightgbm": {
+      "MAPE": 2.2706815731859042,
+      "MAE": 932.7995858781389
+    },
+    "epias_plan": {
+      "MAPE": 2.596057315101445,
+      "MAE": 1045.0911047510017
+    }
+  },
+  "holidays_only": {
+    "seasonal_naive": {
+      "MAPE": 18.866448185604582
+    },
+    "ridge": {
+      "MAPE": 7.2162962232813515
+    },
+    "lightgbm": {
+      "MAPE": 4.195340101298462
+    },
+    "epias_plan": {
+      "MAPE": 4.2675722784568615
+    }
+  },
+  "monthly_MAPE": {
+    "2025-11": {
+      "seasonal_naive": 1.93,
+      "ridge": 2.13,
+      "lightgbm": 1.14,
+      "epias_plan": 1.53
+    },
+    "2025-12": {
+      "seasonal_naive": 2.21,
+      "ridge": 3.09,
+      "lightgbm": 1.84,
+      "epias_plan": 2.23
+    },
+    "2026-01": {
+      "seasonal_naive": 4.7,
+      "ridge": 3.88,
+      "lightgbm": 2.37,
+      "epias_plan": 3.05
+    },
+    "2026-02": {
+      "seasonal_naive": 3.08,
+      "ridge": 2.94,
+      "lightgbm": 2.43,
+      "epias_plan": 2.7
+    },
+    "2026-03": {
+      "seasonal_naive": 8.3,
+      "ridge": 5.04,
+      "lightgbm": 3.44,
+      "epias_plan": 3.34
+    },
+    "2026-04": {
+      "seasonal_naive": 3.29,
+      "ridge": 2.72,
+      "lightgbm": 1.92,
+      "epias_plan": 2.89
+    },
+    "2026-05": {
+      "seasonal_naive": 9.65,
+      "ridge": 4.43,
+      "lightgbm": 3.04,
+      "epias_plan": 4.18
+    },
+    "2026-06": {
+      "seasonal_naive": 8.94,
+      "ridge": 4.59,
+      "lightgbm": 1.86,
+      "epias_plan": 2.45
+    },
+    "2026-07": {
+      "seasonal_naive": 4.36,
+      "ridge": 2.89,
+      "lightgbm": 1.96,
+      "epias_plan": 2.35
+    },
+    "2026-08": {
+      "seasonal_naive": 4.97,
+      "ridge": 2.77,
+      "lightgbm": 2.82,
+      "epias_plan": 2.42
+    },
+    "2026-09": {
+      "seasonal_naive": 4.51,
+      "ridge": 2.13,
+      "lightgbm": 1.62,
+      "epias_plan": 1.79
+    },
+    "2026-10": {
+      "seasonal_naive": 2.68,
+      "ridge": 2.68,
+      "lightgbm": 1.62,
+      "epias_plan": 1.86
+    },
+    "2026-11": {
+      "seasonal_naive": 4.63,
+      "ridge": 3.34,
+      "lightgbm": 2.71,
+      "epias_plan": 2.04
+    }
+  },
+  "feature_importance_gain_share": {
+    "lag_168h": 0.4185,
+    "lag_336h": 0.1462,
+    "temp_24h_mean": 0.0541,
+    "doy_sin": 0.0467,
+    "lag_48h": 0.0466,
+    "mean_last_week_same_hour": 0.043,
+    "month": 0.0358,
+    "dayofweek": 0.0318,
+    "doy_cos": 0.0298,
+    "hour": 0.0292,
+    "mean_last_day": 0.025,
+    "days_to_bayram": 0.0246,
+    "is_holiday": 0.0147,
+    "lag_72h": 0.0111,
+    "temp_national": 0.0108,
+    "is_weekend": 0.0102,
+    "cdd": 0.0089,
+    "hdd": 0.0089,
+    "is_bayram": 0.0022,
+    "is_half_day": 0.0011,
+    "is_bridge": 0.0008
+  }
+}

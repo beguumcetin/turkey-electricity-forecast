@@ -11,3 +11,5 @@ data/processed/features.parquet
 
 # Local working notes for Claude Code
 CLAUDE.md
+.eptr2-tgt
+models/

@@ -33,7 +33,8 @@ pred, metrics = load()
 st.title("⚡ Day-ahead electricity demand forecast for Türkiye")
 st.caption(
     f"Hourly national consumption, test period {metrics['test_period'][0]} – {metrics['test_period'][1]}. "
-    "Every forecast uses only data that would have been available on the morning of the previous day."
+    "Consumption features use only data available on the morning of the previous day. Temperature is the observed "
+    "value, not a forecast, which favours the models over the load plan (see the README)."
 )
 
 cols = st.columns(len(MODELS))

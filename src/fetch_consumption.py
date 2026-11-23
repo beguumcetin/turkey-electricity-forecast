@@ -7,6 +7,7 @@ Needs a free EPİAŞ Transparency Platform account. Put the credentials in a
 """
 
 import os
+import time
 from datetime import date, timedelta
 
 import pandas as pd
@@ -24,10 +25,26 @@ def month_ranges(start: date, end: date):
         cur = nxt
 
 
+def call_with_retry(eptr: EPTR2, call: str, s: date, e: date, tries: int = 6) -> pd.DataFrame:
+    """EPİAŞ allows 80 requests per minute and answers 429 beyond that. Pause between
+    calls and back off when throttled."""
+    for attempt in range(tries):
+        try:
+            df = eptr.call(call, start_date=s.isoformat(), end_date=e.isoformat())
+            time.sleep(1.0)
+            return df
+        except Exception as exc:
+            if "429" not in str(exc) or attempt == tries - 1:
+                raise
+            wait = 20 * (attempt + 1)
+            print(f"throttled, waiting {wait}s")
+            time.sleep(wait)
+
+
 def fetch(eptr: EPTR2, call: str, value_col: str, start: date, end: date) -> pd.DataFrame:
     frames = []
     for s, e in month_ranges(start, end):
-        df = eptr.call(call, start_date=s.isoformat(), end_date=e.isoformat())
+        df = call_with_retry(eptr, call, s, e)
         print(f"{call}: {s} – {e}  ({len(df)} rows)")
         frames.append(df)
     df = pd.concat(frames, ignore_index=True)

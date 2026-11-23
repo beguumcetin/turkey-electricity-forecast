@@ -104,6 +104,7 @@ def monthly_errors(metrics):
     ax.set_xticklabels(m.index, rotation=45, ha="right")
     ax.set_ylabel("MAPE (%)")
     ax.set_title("Monthly error on the test year (lower is better)")
+    ax.set_ylim(top=ax.get_ylim()[1] * 1.25)
     ax.legend(frameon=False, ncol=4)
     save(fig, "monthly_errors.png")
 

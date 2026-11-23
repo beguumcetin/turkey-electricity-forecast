@@ -4,7 +4,7 @@ English | [Türkçe](README.tr.md)
 
 An hourly, day-ahead forecast of Türkiye's national electricity consumption, compared against the official day-ahead load plan published by EPİAŞ (the Turkish energy exchange). The question: can a model built from calendar, holiday, weather and recent-consumption features beat the plan the grid operator already publishes?
 
-**Status: work in progress.** The code is written, but the pipeline has not yet been run on the consumption data, which needs an EPİAŞ Transparency Platform account. This README therefore reports no results. They will be added once the models have been trained and tested.
+On a held-out year, the LightGBM model beats the load plan by a small margin (2.27% against 2.60% mean absolute percentage error), but the comparison favours the model somewhat; see [How fair is the comparison](#how-fair-is-the-comparison).
 
 ## Design
 
@@ -30,6 +30,48 @@ An hourly, day-ahead forecast of Türkiye's national electricity consumption, co
 
 Errors are reported as MAPE and MAE on the held-out year.
 
+## Results
+
+Test period: 24 November 2025 to 23 November 2026, 8,735 hours for which all four forecasts exist. MAPE is the mean absolute percentage error and MAE is in MWh.
+
+| Model | MAPE | MAE | MAPE on holidays |
+|---|---|---|---|
+| Same hour one week earlier | 5.06% | 1,983 | 18.87% |
+| Ridge regression | 3.35% | 1,341 | 7.22% |
+| **LightGBM** | **2.27%** | **933** | **4.20%** |
+| EPİAŞ day-ahead load plan | 2.60% | 1,045 | 4.27% |
+
+"Holidays" means public holidays, bridge days and bayram days.
+
+LightGBM had a lower error than the plan on 58% of the 364 days. Its average daily MAPE was 0.33 percentage points lower, with a bootstrap 95% interval of 0.16 to 0.50 (resampling whole days and treating them as independent). It did worse than the plan in 3 of the 13 months: March, August and November 2026 (the first and last months are partial). The most important features are the same hour one week earlier (42% of the model's gain) and two weeks earlier (15%).
+
+![An ordinary week and a holiday week](reports/figures/forecast_weeks.png)
+
+![Monthly error on the test year](reports/figures/monthly_errors.png)
+
+## How fair is the comparison
+
+The temperature the models see is the temperature that actually occurred (Open-Meteo archive). A real day-ahead forecast only has a *forecast* temperature, so the models have an advantage the load plan does not. To see how much that matters, `src/sensitivity.py` adds a random error to the test-period temperature (one error per day; the sizes are assumptions, not measured forecast errors) and also retrains the model without any weather feature:
+
+| LightGBM variant | MAPE |
+|---|---|
+| Observed temperature (main result) | 2.27% |
+| Temperature with a daily error of 1 °C (standard deviation) | 2.32% |
+| Temperature with a daily error of 2 °C | 2.45% |
+| Temperature with a daily error of 3 °C | 2.58% |
+| No weather features | 2.50% |
+| EPİAŞ load plan | 2.60% |
+
+So the model's edge over the plan is real but small, and it shrinks to nothing if the temperature forecast is off by about 3 °C. The no-weather variant still edges the plan, which suggests calendar and recent-consumption features carry most of the signal. These numbers move by about 0.1 between random draws.
+
+## Limits
+
+- One test year from one run. The 0.33-point gain is small next to how much the monthly errors vary.
+- The weather advantage described above. A fair test needs archived day-ahead temperature forecasts, which this project does not have.
+- The model parameters were set in advance and not tuned on the test year. Only the number of trees was chosen, on the last two months of the training period.
+- Consumption is the real-time series from EPİAŞ, which may be revised later.
+- I do not know what information EPİAŞ's plan is built on or exactly when it is published.
+
 ## Pipeline
 
 ```
@@ -38,6 +80,7 @@ src/fetch_weather.py       hourly temperature for six provinces from Open-Meteo
 src/features.py            one row per hour: calendar, holiday, weather and lag features
 src/train.py               trains and compares the models, writes the metrics
 src/report.py             the figures for this README
+src/sensitivity.py        weather-error and no-weather checks, paired comparison with the plan
 app/streamlit_app.py       explore the test-year forecasts day by day
 ```
 
@@ -53,6 +96,7 @@ python3 -m venv .venv
 .venv/bin/python -m src.features
 .venv/bin/python -m src.train
 .venv/bin/python -m src.report
+.venv/bin/python -m src.sensitivity
 .venv/bin/streamlit run app/streamlit_app.py
 ```
 
